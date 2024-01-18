@@ -52,10 +52,7 @@ async def predict_custom_audio_genre(file: UploadFile = File(...)):
         audio_fp = f"./temp/{file.filename}"
         with open(audio_fp, "wb") as buffer:
             buffer.write(file.file.read())
-
-        # Use the predict_genre function to get the predicted genre
         predicted_genre = predict_genre(model, scaler, audio_fp)
-
         return JSONResponse(content={"predicted_genre": predicted_genre})
     except Exception as e:
         return JSONResponse(content={"error": f"Error during prediction: {str(e)}"}, status_code=500)

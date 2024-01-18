@@ -1,13 +1,54 @@
 <!DOCTYPE html>
 <html>
-<body>
-
-<h2>Upload Audio File</h2>
-
-<form action="/predict" method="post" enctype="multipart/form-data">
-  <input type="file" name="file">
-  <button type="submit">Predict Genre</button>
-</form>
-
-</body>
+  <head>
+    <title>Music Genre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div
+      class="flex flex-col font-mono bg-gray-200 justify-center items-center h-screen">
+      <div
+        class="border border-zinc-400 shadow-lg p-2 rounded-md bg-gray-300 flex justify-evenly items-center gap-4 list-none mb-4">
+        <li class="bg-red-500 p-1 rounded-md">Blues</li>
+        <li class="bg-blue-500 p-1 rounded-md">Classical</li>
+        <li class="bg-green-500 p-1 rounded-md">Pop</li>
+        <li class="bg-yellow-500 p-1 rounded-md">Hip Hop</li>
+        <li class="bg-orange-500 p-1 rounded-md">Metal</li>
+        <li class="bg-pink-500 p-1 rounded-md">Rock</li>
+        <li class="bg-purple-500 p-1 rounded-md">Country</li>
+        <li class="bg-fuchsia-500 p-1 rounded-md">Jazz</li>
+        <li class="bg-teal-500 p-1 rounded-md">Reggae</li>
+        <li class="bg-emerald-500 p-1 rounded-md">Disco</li>
+      </div>
+      <div
+        class="bg-gray-100 flex flex-col gap-4 items-center border border-gray-500 rounded-md p-8 shadow-lg">
+        <h1 class="text-2xl font-bold text-center">Music Genre Classifier</h1>
+        <h2 class="text-red-500 text-center text-lg font-semibold">
+          Upload Audio File
+        </h2>
+        <form
+          class="flex gap-2 items-center"
+          action="/predict"
+          method="post"
+          enctype="multipart/form-data">
+          <input
+            class="border border-gray-500 p-0.5 rounded-md"
+            type="file"
+            name="file" />
+          <button
+            class="bg-blue-600 hover:bg-blue-500 font-semibold text-white p-1 rounded-md"
+            type="submit">
+            Predict Genre
+          </button>
+        </form>
+      </div>
+      <div
+        class="mt-4 bg-gray-100 p-2 rounded-md border border-gray-500 shadow-lg">
+        Predicted Genre : {this}
+      </div>
+      <div class="absolute text-sm text-gray-500/50 bottom-4 right-8">
+        By Amit (55), Harshil (56) and Sumit (58)
+      </div>
+    </div>
+  </body>
 </html>
