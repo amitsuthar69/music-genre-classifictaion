@@ -3,6 +3,7 @@
   <head>
     <title>Music Genre</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
   </head>
   <body>
     <div
@@ -27,14 +28,15 @@
           Upload Audio File
         </h2>
         <form
+          id="audioForm"
           class="flex gap-2 items-center"
-          action="http://localhost:3000/predict"
+          action="/predict"
           method="post"
           enctype="multipart/form-data">
           <input
             class="border border-gray-500 p-0.5 rounded-md"
             type="file"
-            name="file" />
+            name="audio_file" />
           <button
             class="bg-blue-600 hover:bg-blue-500 font-semibold text-white p-1 rounded-md"
             type="submit">
@@ -42,10 +44,13 @@
           </button>
         </form>
       </div>
+      {% if res %}
       <div
+        id="predictedGenreText"
         class="mt-4 bg-gray-100 p-2 rounded-md border border-gray-500 shadow-lg">
-        Predicted Genre : {this}
+        Predicted Genre: <span id="predictedGenre">{{res}}</span>
       </div>
+      {% endif %}
       <div class="absolute text-sm text-gray-500/50 bottom-4 right-8">
         By Amit (55), Harshil (56) and Sumit (58)
       </div>

@@ -11,11 +11,12 @@ import tensorflow as tf
 from keras.utils import to_categorical
 import uvicorn
 
+scaler = StandardScaler()
+
 templates = Jinja2Templates(directory="templates")
 app = FastAPI()
 
 model = tf.keras.models.load_model('./Music-genre-classification')
-scaler = MinMaxScaler()
 
 index_label = {'blues': 0, 'classical': 1, 'country': 2, 'disco': 3, 'hiphop': 4, 'jazz': 5, 'metal': 6, 'pop': 7, 'reggae': 8, 'rock': 9}
 
@@ -35,7 +36,7 @@ def extract_features(audio_data, sr):
     mfccs = librosa.feature.mfcc(y=audio_data, sr=sr, n_mfcc=20)
 
     # Combine features into a DataFrame
-    features_df = pd.DataFrame({
+    external_data = pd.DataFrame({
         'chroma_stft_mean': np.mean(chroma_stft, axis=1),
         'chroma_stft_var': np.var(chroma_stft, axis=1),
         'rms_mean': np.mean(rms),
@@ -95,29 +96,39 @@ def extract_features(audio_data, sr):
         'mfcc20_var': np.var(mfccs[19, :]),
     })
 
-    return features_df
+    print(external_data)
+
+    mean_values = external_data.mean()
+    std_values = external_data.std()
+   # Check for zero standard deviation
+    if (std_values == 0).any():
+        # Handle the case where standard deviation is zero (avoid division by zero)
+        print("Warning: Zero standard deviation detected. Skipping normalization.")
+        external_data_scaled = external_data.copy()
+    else:
+        # Normalize the external_data using calculated mean and std
+        external_data_scaled = (external_data - mean_values) / std_values
+
+    print(external_data_scaled)
+
+    return external_data_scaled
 
 # Define prediction endpoint
-@app.post("/predict")
-async def predict_genre(audio_file: UploadFile = File(...)):
+@app.post("/predict", response_class=HTMLResponse)
+async def predict_genre(request: Request, audio_file: UploadFile = File(...)):
     try:
         audio_data, sr = librosa.load(audio_file.file)
-        features_df = extract_features(audio_data, sr)
-
-        # Select only the required feature columns
-        features_subset = features_df[feature_names]
-
-        # Normalize the features
-        features_scaled = scaler.transform(features_subset)
-
-        # Make prediction
+        features_scaled = extract_features(audio_data, sr)
+        print("Features scaled:", features_scaled)
         prediction = model.predict(features_scaled)
-        predicted_genre_index = np.argmax(prediction)
-        predicted_genre = index_label[predicted_genre_index]  # Assuming you have the label mapping
-
-        print(predicted_genre_index)
-        print(predicted_genre)
-        return predicted_genre
+        print(prediction)
+        predicted_genre_index = np.argmax(prediction)%10
+        res = (list(index_label.keys())[predicted_genre_index])
+        #return res
+        return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "res": res},
+    )
     except Exception as e:
         print(e)
         return str(e)
@@ -127,4 +138,4 @@ async def main(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=3000)
+    uvicorn.run(app, host="localhost", port=8080)
